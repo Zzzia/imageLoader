@@ -114,6 +114,9 @@ public class ImgUtil {
      */
     private static void save(Bitmap bitmap,String key) {
         try {
+            if(getDiskSize() > 10000000){
+                clearDisk();
+            }
             File appDir = new File(mContext.getExternalCacheDir().getPath());
             String fileName = key + ".jpg";
             File file = new File(appDir, fileName);
