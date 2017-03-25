@@ -2,7 +2,7 @@
 
 recyclerAdapter链接：https://github.com/Zzzia/imageLoader/blob/master/app/src/main/java/com/zia/test/recyclerAdapter.java
 
-
+从磁盘加载肯定有问题，蓝瘦/(ㄒoㄒ)/~~
 
 example:
 
