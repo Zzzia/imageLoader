@@ -52,54 +52,58 @@ public class ImgUtil {
      * @param imageView 加载到imageView
      * @param context Context
      */
-    public static void loadUrl(final String url, final ImageView imageView, final Context context){
-        //将url进行md5加密
-        if(url != null){
-            md5Url = getMD5(url);
-        }
-        //获取context
-        if(mContext == null) mContext = context;
-        //从缓存中查找
-        if(lruCache.get(md5Url) != null){
-            imageView.setImageBitmap(lruCache.get(md5Url));
-        }
-        //从磁盘中查找
-        else if(fromDisk(md5Url) != null){
-            imageView.setImageBitmap(fromDisk(md5Url));
-        }
-        else {//从网络中下载
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    InputStream inputStream = null;
-                    HttpURLConnection urlConnection = null;
-                    try {
-                        urlConnection = (HttpURLConnection)new URL(url).openConnection();
-                        urlConnection.setDoInput(true);
-                        urlConnection.connect();
-                        inputStream = urlConnection.getInputStream();
-                        bitmap = BitmapFactory.decodeStream(inputStream);
-                        //在ui线程中设置加载bitmap到imageView
-                        ((Activity)context).runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                imageView.setImageBitmap(bitmap);
-                            }
-                        });
-                        //将url作为key保存到缓存
-                        if(md5Url != null && bitmap != null)
-                        lruCache.put(md5Url,bitmap);
-                        save(bitmap,md5Url);
-                        inputStream.close();
-                    } catch (MalformedURLException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }finally {
-                        urlConnection.disconnect();
-                    }
+    public static void loadUrl(final String url, final ImageView imageView, final Context context) {
+        synchronized (context) {
+            //将url进行md5加密
+            if (url != null) {
+                md5Url = getMD5(url);//加密
+                //获取context
+                if (mContext == null) mContext = context;
+                //从缓存中查找
+                if (lruCache.get(md5Url) != null) {
+                    imageView.setImageBitmap(lruCache.get(md5Url));
+                    Log.d("img", "从缓存中找到" + md5Url);
                 }
-            }).start();
+                //从磁盘中查找
+                else if (fromDisk(md5Url) != null) {
+                    Log.d("img", "从磁盘中找到" + md5Url);
+                    imageView.setImageBitmap(fromDisk(md5Url));
+                } else {//从网络中下载
+                    Log.d("img", "从网络中下载");
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            InputStream inputStream = null;
+                            HttpURLConnection urlConnection = null;
+                            try {
+                                urlConnection = (HttpURLConnection) new URL(url).openConnection();
+                                urlConnection.setDoInput(true);
+                                urlConnection.connect();
+                                inputStream = urlConnection.getInputStream();
+                                bitmap = BitmapFactory.decodeStream(inputStream);
+                                //在ui线程中设置加载bitmap到imageView
+                                ((Activity) context).runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        imageView.setImageBitmap(bitmap);
+                                    }
+                                });
+                                //将url作为key保存到缓存
+                                if (md5Url != null && bitmap != null)
+                                    lruCache.put(md5Url, bitmap);
+                                save(bitmap, md5Url);
+                                inputStream.close();
+                            } catch (MalformedURLException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } finally {
+                                urlConnection.disconnect();
+                            }
+                        }
+                    }).start();
+                }
+            }
         }
     }
 
@@ -111,14 +115,11 @@ public class ImgUtil {
     private static void save(Bitmap bitmap,String key) {
         try {
             File appDir = new File(mContext.getExternalCacheDir().getPath());
-            if (!appDir.exists()) {
-                appDir.mkdir();
-            }
             String fileName = key + ".jpg";
             File file = new File(appDir, fileName);
             FileOutputStream fos = new FileOutputStream(file);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-            Log.d("img","saveName: "+ fileName);
+            Log.d("img","已保存: "+ fileName);
             fos.flush();
             fos.close();
         } catch (FileNotFoundException e) {
@@ -134,6 +135,7 @@ public class ImgUtil {
      * @return bitmap
      */
     private static Bitmap fromDisk(String md5){
+        Log.d("img","磁盘大小： "+getDiskSize());
         String key = md5 + ".jpg";//加上后缀
         File file = new File(mContext.getExternalCacheDir().getPath());//获取缓存文件夹
         File[] files = file.listFiles();//获取所有文件
@@ -155,10 +157,37 @@ public class ImgUtil {
      */
     private static String getKey(String path){
         String FileEnd = path.substring(path.lastIndexOf("/") + 1);
-        Log.d("img","getKey: "+FileEnd);
         return FileEnd;
     }
 
+    /**
+     * 获取缓存文件的总大小
+     * @return size
+     */
+    public static long getDiskSize(){
+        long size = 0;
+        try {
+            File file = new File(mContext.getExternalCacheDir().getPath());//获取缓存文件夹
+            File[] files = file.listFiles();//获取所有文件
+            for(int i=0;i<files.length;i++){
+                size = size + files[i].length();
+            }
+        }catch (Exception e){
+
+        }
+        return size;
+    }
+
+    /**
+     * 清除cache目录所有文件
+     */
+    public static void clearDisk(){
+        File file = new File(mContext.getExternalCacheDir().getPath());//获取缓存文件夹
+        File[] files = file.listFiles();//获取所有文件
+        for (File f : files) {
+            f.delete();
+        }
+    }
 
     /**
      * md5加密
