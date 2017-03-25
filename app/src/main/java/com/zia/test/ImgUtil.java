@@ -81,6 +81,7 @@ public class ImgUtil {
                                 urlConnection.connect();
                                 inputStream = urlConnection.getInputStream();
                                 bitmap = BitmapFactory.decodeStream(inputStream);
+                                if ( bitmap != null) {
                                 //在ui线程中设置加载bitmap到imageView
                                 ((Activity) context).runOnUiThread(new Runnable() {
                                     @Override
@@ -89,15 +90,19 @@ public class ImgUtil {
                                     }
                                 });
                                 //将url作为key保存到缓存
-                                if (md5Url != null && bitmap != null)
                                     lruCache.put(md5Url, bitmap);
-                                save(bitmap, md5Url);
-                                inputStream.close();
+                                    save(bitmap, md5Url);
+                                }
                             } catch (MalformedURLException e) {
                                 e.printStackTrace();
                             } catch (IOException e) {
                                 e.printStackTrace();
                             } finally {
+                                try {
+                                    inputStream.close();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                                 urlConnection.disconnect();
                             }
                         }
@@ -114,15 +119,20 @@ public class ImgUtil {
      */
     private static void save(Bitmap bitmap,String key) {
         if (bitmap != null) {
+            String fileName = key + ".jpg";
+            File appDir = new File(mContext.getExternalCacheDir().getPath());//获取缓存文件夹
+            if (!appDir.exists()) {
+                appDir.mkdir();
+            }
+            File[] files = appDir.listFiles();//获取所有文件
+            for(int i=0;i<files.length;i++){
+                //磁盘缓存中找到这个图片
+                if(getKey(files[i].getPath()).equals(fileName)){
+                    return;//返回，不再保存
+                }
+            }
             try {
-                if (getDiskSize() > 10000000) {
-                    clearDisk();
-                }
-                File appDir = new File(mContext.getExternalCacheDir().getPath());
-                if (!appDir.exists()) {
-                    appDir.mkdir();
-                }
-                String fileName = key + ".jpg";
+                if (getDiskSize() > 10000000) clearDisk();//超过容量清空缓存
                 File file = new File(appDir, fileName);
                 FileOutputStream fos = new FileOutputStream(file);
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
