@@ -113,22 +113,27 @@ public class ImgUtil {
      * @param key 保存名字的前缀
      */
     private static void save(Bitmap bitmap,String key) {
-        try {
-            if(getDiskSize() > 10000000){
-                clearDisk();
+        if (bitmap != null) {
+            try {
+                if (getDiskSize() > 10000000) {
+                    clearDisk();
+                }
+                File appDir = new File(mContext.getExternalCacheDir().getPath());
+                if (!appDir.exists()) {
+                    appDir.mkdir();
+                }
+                String fileName = key + ".jpg";
+                File file = new File(appDir, fileName);
+                FileOutputStream fos = new FileOutputStream(file);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                Log.d("img", "已保存: " + fileName);
+                fos.flush();
+                fos.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            File appDir = new File(mContext.getExternalCacheDir().getPath());
-            String fileName = key + ".jpg";
-            File file = new File(appDir, fileName);
-            FileOutputStream fos = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-            Log.d("img","已保存: "+ fileName);
-            fos.flush();
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
