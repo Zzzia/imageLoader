@@ -7,7 +7,7 @@
     android:orientation="vertical"
     tools:context="com.zia.test.MainActivity">
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/recylcerview"
+        android:id="@+id/recylcerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </LinearLayout>

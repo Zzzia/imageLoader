@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void bind(){
         imageView = (ImageView)findViewById(R.id.image);
-        recyclerView = (RecyclerView)findViewById(R.id.recylcerview);
+        recyclerView = (RecyclerView)findViewById(R.id.recylcerView);
     }
 
     private void setRecyclerView(){
@@ -68,35 +68,4 @@ public class MainActivity extends AppCompatActivity {
             });
     }
 
-
-    /*private void Sgson(){
-        if(data != null){
-            imgDataList.clear();
-            int k = j+10;
-            ImgData imgData = new ImgData();
-            for(;j<k;j++){
-                Results result = data.getResults()[j];
-                imgData.setName(result.get_id());
-                imgData.setUrl(result.getUrl());
-                imgDataList.add(imgData);
-            }
-            download();
-            adapter.fresh(imgDataList,lruCache);
-        }
-    }*/
-
-    /*private void download(){
-        ImageGeter imageGeter = new ImageGeter(imgDataList);
-        imageGeter.Download(new ImageGeter.Callback() {
-            @Override
-            public void onFinish(LruCache<String, Bitmap> mMemoryCache) {
-                lruCache = mMemoryCache;
-            }
-
-            @Override
-            public void Erorr(IOException e) {
-                e.printStackTrace();
-            }
-        });
-    }*/
 }

@@ -46,7 +46,8 @@ public class recyclerAdapter extends RecyclerView.Adapter<recyclerAdapter.MyView
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         holder.imageView.setVisibility(View.VISIBLE);
-        ImgUtil.loadUrl(urlList.get(position),holder.imageView,mContext);
+        //ImgUtil.loadUrl(urlList.get(position),holder.imageView,mContext);
+        MimageLoader.build(mContext).setBitmap(urlList.get(position),holder.imageView);
     }
 
     @Override
