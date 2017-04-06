@@ -1,6 +1,6 @@
-类的链接在这里：https://github.com/Zzzia/imageLoader/blob/master/app/src/main/java/com/zia/test/ImgUtil.java
+[类的链接在这里]https://github.com/Zzzia/imageLoader/blob/master/app/src/main/java/com/zia/test/MimageLoader.java)
 
-recyclerAdapter链接：https://github.com/Zzzia/imageLoader/blob/master/app/src/main/java/com/zia/test/recyclerAdapter.java
+[recyclerAdapter链接](https://github.com/Zzzia/imageLoader/blob/master/app/src/main/java/com/zia/test/recyclerAdapter.java)
 
 从磁盘加载肯定有问题，蓝瘦/(ㄒoㄒ)/~~
 
