@@ -1,7 +1,10 @@
 package com.zia.test;
 
 import android.content.Context;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,11 +46,12 @@ public class recyclerAdapter extends RecyclerView.Adapter<recyclerAdapter.MyView
         return holder;
     }
 
+
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
-        holder.imageView.setVisibility(View.VISIBLE);
-        //ImgUtil.loadUrl(urlList.get(position),holder.imageView,mContext);
-        MimageLoader.build(mContext).setBitmap(urlList.get(position),holder.imageView);
+        ImageView imageView = holder.imageView;
+        imageView.setVisibility(View.VISIBLE);
+        MimageLoader.build(mContext).setImagePlace(R.mipmap.ic_launcher).setDiskCacheSize(100).setBitmap(urlList.get(position),imageView);
     }
 
     @Override

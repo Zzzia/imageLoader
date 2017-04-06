@@ -1,16 +1,21 @@
+/**
+ * example in onBindViewHolder:
+ * MimageLoader.build(mContext).setImagePlace(R.mipmap.ic_launcher).setDiskCacheSize(100).setBitmap(urlList.get(position),imageView);
+ */
+
 package com.zia.test;
 
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.widget.ImageView;
-
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
@@ -34,7 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 
 public class MimageLoader {
-    private static final String TAG = "ImageLoader";
+    private static final String TAG = "MimageLoader";
     //obtainMessage的TAG
     private static final int MESSAGE_POST_RESULT = 1;
     //cpu的核心数量
@@ -46,7 +51,7 @@ public class MimageLoader {
     //线程的等待时长
     private static final long KEEP_ALIVE = 10L;
     //硬盘缓存的最大值50M
-    private static final long DISK_CACHE_SISE = 1024 * 1024 * 50;
+    private static long DISK_CACHE_SIZE = 1024 * 1024 * 50;
     //创建一个ThreadFactory，为线程池做准备
     private static final ThreadFactory mThreadFactory = new ThreadFactory() {
         //线程安全的加减操作
@@ -82,8 +87,7 @@ public class MimageLoader {
             }
         }
     };
-
-
+    private static int imagePlaceID = -1;
     private Context mContext;
     private ImageResizer mImageResizer;
     private LruCache<String, Bitmap> mMemoryCache;
@@ -92,12 +96,12 @@ public class MimageLoader {
 
     private MimageLoader(Context context) {
         mContext = context.getApplicationContext();//获取application的上下文
-        int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);//单位为kb
+        int maxMemory = (int) (Runtime.getRuntime().maxMemory()/1024);//单位为kb
         int cacheSize = maxMemory / 8;//取最大内存的1／8；
         mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
             @Override
             protected int sizeOf(String key, Bitmap value) {
-                return value.getRowBytes() * value.getHeight() / 1024; //单位为kb
+                return value.getRowBytes() * value.getHeight()/1024; //单位为kb
             }
         };
         mFilePath = mContext.getExternalCacheDir().getPath();
@@ -117,33 +121,30 @@ public class MimageLoader {
     /**
      * 将Bitmap加入LruCache
      *
-     * @param key
+     * @param url
      * @param bitmap
      */
-    private void addBitmapToMemoryCache(String key, Bitmap bitmap) {
-        if (getBitmapFromMemoryCache(key) == null && key != null && bitmap != null) {
-            mMemoryCache.put(key, bitmap);
+    private void addBitmapToMemoryCache(String url, Bitmap bitmap) {
+        if (url != null && bitmap != null) {
+            mMemoryCache.put(url, bitmap);
+            Log.d("zzzia","add To memory"+url);
         }
     }
 
     /**
      * 从LruCache中取出bitmap
      *
-     * @param key
+     * @param url
      * @return
      */
-    private Bitmap getBitmapFromMemoryCache(String key) {
-        return mMemoryCache.get(key);
-    }
-
-    /**
-     * 从LruCache中取出bitmap
-     * @param url 图片的url
-     * @return
-     */
-    private Bitmap loadBitmapFromMemoryCache(String url) {
-        //Log.d(TAG, "fromLruCache");
-        return getBitmapFromMemoryCache(getMD5(url));
+    private Bitmap getBitmapFromMemoryCache(String url) {
+        if(mMemoryCache.get(url) != null){
+            Log.d("zzzia","从memory中找到"+url);
+        }
+        else {
+            Log.d("zzzia","get  == null"+url);
+        }
+        return mMemoryCache.get(url);
     }
 
     /**
@@ -167,8 +168,12 @@ public class MimageLoader {
             urlConnection.setDoInput(true);
             urlConnection.connect();
             inputStream = urlConnection.getInputStream();
+            //bitmap = mImageResizer.decodeSampleBitmapFromInputStream(inputStream, reqWidth, reqHeight);
             bitmap = BitmapFactory.decodeStream(inputStream);
-            saveBitmap(bitmap,mFilePath,url,reqWidth,reqHeight);//将bitmap保存到本地
+            if(bitmap != null) {
+                saveBitmap(bitmap, mFilePath, url, reqWidth, reqHeight);//将bitmap保存到本地
+                addBitmapToMemoryCache(url,bitmap);//保存到缓存
+            }
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -193,7 +198,7 @@ public class MimageLoader {
     private Bitmap loadBitmapFromDisk(String url) {
         Bitmap bitmap = null;
         //文件名字
-        String key = getMD5(url) + ".jpg";
+        String key = getMD5(url);
         //获取缓存文件夹
         File file = new File(mFilePath);
         //获取所有文件
@@ -202,11 +207,11 @@ public class MimageLoader {
         for (int i = 0; i < files.length; i++) {
             if (files[i].getName().equals(key)) {
                 bitmap = BitmapFactory.decodeFile(files[i].getPath());
-                //Log.d(TAG, "fromDisk");
+                Log.d("zzzia", "从磁盘找到"+key);
                 break;
             }
         }
-        addBitmapToMemoryCache(getMD5(url), bitmap);
+        addBitmapToMemoryCache(url, bitmap);
         return bitmap;
     }
 
@@ -219,7 +224,8 @@ public class MimageLoader {
      * @return
      */
     public Bitmap loadBitmap(String url, int reqWidth, int reqHeight) {
-        Bitmap bitmap = loadBitmapFromMemoryCache(url);
+        Bitmap bitmap = null;
+        bitmap = getBitmapFromMemoryCache(url);
         if (bitmap != null) {
             Log.d(TAG, "loadBitmap: 从缓存中找出了Bitmap");
             return bitmap;
@@ -230,8 +236,6 @@ public class MimageLoader {
             return bitmap;
         }
         bitmap = loadBitmapFromHttp(url, reqWidth, reqHeight);
-
-        addBitmapToMemoryCache(getMD5(url), bitmap);
         return bitmap;
     }
 
@@ -242,17 +246,16 @@ public class MimageLoader {
      * @param imageview
      */
     public void setBitmap(final String url, final ImageView imageview) {
-        //imageview.setImageResource(R.drawable.loading);
+        if(imagePlaceID != -1){
+            imageview.setImageResource(imagePlaceID);
+        }
         final int width = imageview.getWidth();
         final int height = imageview.getHeight();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            if(imageview.getMinimumHeight() == 0)
+            imageview.setMinimumHeight(10);
+        }
         imageview.setTag(imageview.getId(), url);
-        /*Bitmap bitmap = loadBitmapFromMemoryCache(url);//先尝试从缓存中找bitmap
-        if (bitmap != null) {
-            Log.d(TAG, "bindBitmap: 从缓存中找出了Bitmap,现在设置给ImageView");
-            imageview.setImageBitmap(bitmap);
-            return;
-        }*/
-
         Runnable loadBitmapTask = new Runnable() {
             @Override
             public void run() {
@@ -263,7 +266,6 @@ public class MimageLoader {
                 }
             }
         };
-
         THREAD_POOL_EXECUTOR.execute(loadBitmapTask);
     }
 
@@ -285,35 +287,23 @@ public class MimageLoader {
      * @param reqHeight
      */
     public void saveBitmap(Bitmap bitmap, String path, String url, int reqWidth, int reqHeight) {
-        String filePath;
-        String fileName = getMD5(url) + ".jpg";
-        Log.d(TAG, "文件名: " + fileName);
-        if (path == null) {
-            filePath = mFilePath;
-        } else {
-            filePath = path;
-        }
-        File bitmapDir = new File(filePath);
+        String fileName = getMD5(url);
+        File bitmapDir = new File(path);
         if (!bitmapDir.exists()) {
             bitmapDir.mkdir();
         }
         try {
-            if (getDiskSize(filePath) > DISK_CACHE_SISE) {
+            if (getDiskSize(path) > DISK_CACHE_SIZE) {
                 clearDisk(path);
             }
-            File file = new File(filePath, fileName);
+            File file = new File(path, fileName);
             if (file.exists()) {
                 return;
             }
+            //向磁盘保存数据
             FileOutputStream fos = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
             //Bitmap bitmap = mImageResizer.decodeSampleBitmapFromInputStream(in, reqWidth, reqHeight);
-            if (bitmap!=null){
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-                Log.d(TAG, "已保存: " + fileName);
-            }
-            else {
-                Log.d(TAG, "本地保存失败");
-            }
             fos.flush();
             fos.close();
         } catch (IOException e) {
@@ -355,7 +345,6 @@ public class MimageLoader {
 
     /**
      * MD5加密
-     *
      * @param val 待加密字符串
      * @return 加密后的string
      * @throws NoSuchAlgorithmException
@@ -373,7 +362,21 @@ public class MimageLoader {
         for (int i = 0; i < m.length; i++) {
             sb.append(m[i]);
         }
-        return sb.toString();
+        return sb.toString() + ".jpg";
+    }
+
+    /**
+     * 更改磁盘缓存大小
+     * @param size mb
+     */
+    public MimageLoader setDiskCacheSize(int size){
+        DISK_CACHE_SIZE = 1024 * 1024 * size;
+        return this;
+    }
+
+    public MimageLoader setImagePlace(int id){
+        imagePlaceID = id;
+        return this;
     }
 
     private static class LoaderResult {
@@ -388,6 +391,9 @@ public class MimageLoader {
         }
     }
 
+    /**
+     * 图片大小适应屏幕的工具，使用后没法储存在本地，暂时不用
+     */
     public class ImageResizer {
         private static final String TAG = "ImageResizer";
 
