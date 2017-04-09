@@ -39,10 +39,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-/**
- * Created by xushuzhan on 2017/3/29.
- */
-
 public class MimageLoader {
     private static final String TAG = "MimageLoader";
     //obtainMessage的TAG
