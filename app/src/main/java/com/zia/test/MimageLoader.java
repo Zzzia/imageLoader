@@ -1,6 +1,11 @@
 /**
  * example in onBindViewHolder:
- * MimageLoader.build(mContext).setImagePlace(R.mipmap.ic_launcher).setDiskCacheSize(100).setBitmap(urlList.get(position),imageView);
+ *
+ * MimageLoader.build(mContext).
+     setMultiple(4).//设置内存缓存的大小，4代表最大内存的1/4
+     setImagePlace(R.mipmap.ic_launcher).//设置未加载出来之前显示的图片
+     setDiskCacheSize(100).//设置磁盘缓存大小，这里是100Mb
+     setBitmap(urlList.get(position),imageView);//设置图片，url和imageview
  */
 
 package com.zia.test;
@@ -89,23 +94,21 @@ public class MimageLoader {
     };
     private static int imagePlaceID = -1;
     private Context mContext;
-    private ImageResizer mImageResizer;
-    private LruCache<String, Bitmap> mMemoryCache;
+    //设置缓存倍数，1/MULTIPLE
+    private static int MULTIPLE = 8;
+    private static int cacheSize = (int) (Runtime.getRuntime().maxMemory()) / MULTIPLE;//取最大内存的1／8；
+    private static LruCache<String, Bitmap> mMemoryCache =  new LruCache<String ,Bitmap>(cacheSize){
+        @Override
+        protected int sizeOf(String key, Bitmap value) {
+            //在每次存入缓存的时候调用
+            return value.getByteCount();
+        }
+    };
     //硬盘缓存的地址
     private String mFilePath = null;
-
     private MimageLoader(Context context) {
-        mContext = context.getApplicationContext();//获取application的上下文
-        int maxMemory = (int) (Runtime.getRuntime().maxMemory()/1024);//单位为kb
-        int cacheSize = maxMemory / 8;//取最大内存的1／8；
-        mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
-            @Override
-            protected int sizeOf(String key, Bitmap value) {
-                return value.getRowBytes() * value.getHeight()/1024; //单位为kb
-            }
-        };
+        mContext = context;
         mFilePath = mContext.getExternalCacheDir().getPath();
-        mImageResizer = new ImageResizer();
     }
 
     /**
@@ -371,6 +374,16 @@ public class MimageLoader {
      */
     public MimageLoader setDiskCacheSize(int size){
         DISK_CACHE_SIZE = 1024 * 1024 * size;
+        return this;
+    }
+
+    /**
+     * 设置
+     * @param multiple 倍数
+     * @return
+     */
+    public MimageLoader setMultiple(int multiple){
+        MULTIPLE = multiple;
         return this;
     }
 

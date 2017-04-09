@@ -51,7 +51,11 @@ public class recyclerAdapter extends RecyclerView.Adapter<recyclerAdapter.MyView
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         ImageView imageView = holder.imageView;
         imageView.setVisibility(View.VISIBLE);
-        MimageLoader.build(mContext).setImagePlace(R.mipmap.ic_launcher).setDiskCacheSize(100).setBitmap(urlList.get(position),imageView);
+        MimageLoader.build(mContext).
+                setMultiple(4).
+                setImagePlace(R.mipmap.ic_launcher).
+                setDiskCacheSize(100).
+                setBitmap(urlList.get(position),imageView);
     }
 
     @Override
