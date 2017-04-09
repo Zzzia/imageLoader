@@ -2,25 +2,14 @@
 
 [recyclerAdapter链接](https://github.com/Zzzia/imageLoader/blob/master/app/src/main/java/com/zia/test/recyclerAdapter.java)
 
-无法从lrucache里读出数据，log显示貌似是null
+没毛病的三级缓存...
 
 example:
 
 ~~~
-//所有设置
-MimageLoader.build(mContext).setImagePlace(R.mipmap.ic_launcher).setDiskCacheSize(100).setBitmap(urlList.get(position),imageView);
-
-~~~
-
-
-
-RecyclerAdapter中加载:
-
-~~~
-    @Override
-    public void onBindViewHolder(final MyViewHolder holder, int position) {
-        holder.imageView.setVisibility(View.VISIBLE);
-        MimageLoader.build(mContext).setImagePlace(R.mipmap.ic_launcher).setDiskCacheSize(100).setBitmap(urlList.get(position),imageView);
-    }
-~~~
+MimageLoader.build(mContext).
+     setMultiple(4).                                //设置内存缓存的大小，4代表最大内存的1/4
+     setImagePlace(R.mipmap.ic_launcher).           //设置未加载出来之前显示的图片
+     setDiskCacheSize(100).                         //设置磁盘缓存大小，这里是100Mb
+     setBitmap(urlList.get(position),imageView);    //设置图片，url和imageview
 
