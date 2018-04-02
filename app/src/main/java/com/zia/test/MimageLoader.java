@@ -21,6 +21,10 @@ import android.os.Message;
 import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
+import com.zia.test.imageloader.ImageLoader;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;

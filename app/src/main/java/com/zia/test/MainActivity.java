@@ -7,11 +7,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
+import android.util.LruCache;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
 import com.google.gson.Gson;
+import com.zia.test.imageloader.ImageLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if (!PermissionsUtil.hasDiskPermission(this,200)){
+            Log.e("zfd","no permission");
+        }
         bind();
         getData();
         setRecyclerView();

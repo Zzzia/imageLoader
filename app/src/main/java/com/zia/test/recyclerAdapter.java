@@ -1,14 +1,14 @@
 package com.zia.test;
 
 import android.content.Context;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import com.zia.test.imageloader.ImageLoader;
 
 import java.util.List;
 
@@ -18,18 +18,18 @@ import java.util.List;
 
 public class recyclerAdapter extends RecyclerView.Adapter<recyclerAdapter.MyViewHolder> {
 
-    public interface CallBack{
+    public interface CallBack {
         void onFinish();
     }
 
     private Context mContext;
     List<String> urlList = null;
 
-    recyclerAdapter(List<String> urlList){
+    recyclerAdapter(List<String> urlList) {
         this.urlList = urlList;
     }
 
-    public void refresh(List<String> urlList){
+    public void refresh(List<String> urlList) {
         this.urlList.clear();
         this.urlList = urlList;
         notifyDataSetChanged();
@@ -38,10 +38,10 @@ public class recyclerAdapter extends RecyclerView.Adapter<recyclerAdapter.MyView
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if(mContext == null){
+        if (mContext == null) {
             mContext = parent.getContext();
         }
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item, parent, false);
         MyViewHolder holder = new MyViewHolder(view);
         return holder;
     }
@@ -51,11 +51,11 @@ public class recyclerAdapter extends RecyclerView.Adapter<recyclerAdapter.MyView
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         ImageView imageView = holder.imageView;
         imageView.setVisibility(View.VISIBLE);
-        MimageLoader.build(mContext).
-                setMultiple(4).
-                setImagePlace(R.mipmap.ic_launcher).
-                setDiskCacheSize(100).
-                setBitmap(urlList.get(position),imageView);
+        ImageLoader
+                .with(mContext)
+                .load(urlList.get(position))
+                .into(imageView)
+                .display();
     }
 
     @Override
@@ -65,9 +65,10 @@ public class recyclerAdapter extends RecyclerView.Adapter<recyclerAdapter.MyView
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
+
         public MyViewHolder(View itemView) {
             super(itemView);
-            imageView = (ImageView)itemView.findViewById(R.id.img_item);
+            imageView = (ImageView) itemView.findViewById(R.id.img_item);
         }
     }
 }
