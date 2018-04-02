@@ -1,7 +1,6 @@
 package com.zia.test.imageloader.cache.strategy.net;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 
 import com.zia.test.imageloader.cache.ICache;
 import com.zia.test.imageloader.util.IoHelper;
@@ -17,7 +16,6 @@ public class DiskCache extends ICache {
     public void put(String url, Bitmap bitmap) {
         IoHelper.saveBitmap(
                 bitmap, getConfig().getSavePath(), MD5Helper.getMD5(url));
-        Log.e("strategy","put to disk");
     }
 
     @Override

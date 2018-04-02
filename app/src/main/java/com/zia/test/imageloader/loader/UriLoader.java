@@ -8,7 +8,7 @@ import android.view.View;
 public class UriLoader extends ILoader {
 
     @Override
-    public void load(Object o, View imageView) {
+    public void load(Object o, View imageView, Object tag) {
 
     }
 

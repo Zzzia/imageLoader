@@ -16,7 +16,11 @@ public abstract class ILoader {
     private ICache cache;
     private IConfig config;
 
-    public abstract void load(Object o, View imageView);
+    public void load(Object o, View imageView) {
+        load(o, imageView, null);
+    }
+
+    public abstract void load(Object o, View imageView, Object tag);
 
     protected abstract boolean checkSource(Object o);
 

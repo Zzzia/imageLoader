@@ -10,7 +10,7 @@ import com.zia.test.imageloader.cache.ICache;
 public class BitmapLoader extends ILoader {
 
     @Override
-    public void load(Object o, View imageView) {
+    public void load(Object o, View imageView, Object tag) {
 
     }
 

@@ -22,6 +22,7 @@ public class RequestBuilder {
 
     /**
      * 初始化
+     *
      * @param source 图片来源
      * @param loader 驱动
      */
@@ -35,6 +36,7 @@ public class RequestBuilder {
 
     /**
      * 设置参数
+     *
      * @param config 参数设置抽象类
      * @return
      */
@@ -54,8 +56,12 @@ public class RequestBuilder {
     }
 
     public void display() {
+        display(null);
+    }
+
+    public void display(Object tag) {
         loader.setCache(cache);
         loader.setConfig(config);
-        loader.load(source, imageView);
+        loader.load(source, imageView, tag);
     }
 }

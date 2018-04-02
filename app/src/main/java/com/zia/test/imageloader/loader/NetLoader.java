@@ -15,26 +15,39 @@ import com.zia.test.imageloader.ImageLoader;
 public class NetLoader extends ILoader {
 
     @Override
-    public void load(Object o, final View imageView) {
+    public void load(Object o, final View imageView, final Object tag) {
         if (!checkSource(o) || !checkEngine()) return;
         final String url = (String) o;
         getCache().setConfig(getConfig());
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {//设置透明占位图
+                ((ImageView) imageView).setImageBitmap(Bitmap.createBitmap(1, 1, Bitmap.Config.ALPHA_8));
+            }
+        });
         getConfig().getTreadPoolExecutor().execute(new Runnable() {
             @Override
             public void run() {
                 final Bitmap bitmap = getCache().get(url);
                 if (bitmap == null) {
-                    Log.e(ImageLoader.TAG, "bitmap from netWork is null");
+                    //设置错误图片
                     return;
                 }
-                ((Activity) ImageLoader.getInstance().getContext()).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((ImageView) imageView).setImageBitmap(bitmap);
-                    }
-                });
+//                Log.e("zia", imageView.getTag().toString() + tag.toString() + imageView.getTag().equals(tag) + "");
+                if (imageView.getTag() == tag) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ((ImageView) imageView).setImageBitmap(bitmap);
+                        }
+                    });
+                }
             }
         });
+    }
+
+    private void runOnUiThread(Runnable runnable) {
+        ((Activity) ImageLoader.getInstance().getContext()).runOnUiThread(runnable);
     }
 
     @Override

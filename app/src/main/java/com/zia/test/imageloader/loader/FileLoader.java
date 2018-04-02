@@ -8,8 +8,9 @@ import com.zia.test.imageloader.cache.ICache;
  * Created by zia on 2018/4/2.
  */
 public class FileLoader extends ILoader {
+
     @Override
-    public void load(Object o, View imageView) {
+    public void load(Object o, View imageView, Object tag) {
 
     }
 

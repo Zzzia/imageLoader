@@ -18,7 +18,7 @@ public class DefaultNetCache extends ICache {
     private volatile static DefaultNetCache instance;
 
     private DefaultNetCache() {
-        memoryCache = new MemoryCache((int) (Runtime.getRuntime().maxMemory()) / 2);
+        memoryCache = new MemoryCache();
         diskCache = new DiskCache();
         netCache = new NetCache();
     }

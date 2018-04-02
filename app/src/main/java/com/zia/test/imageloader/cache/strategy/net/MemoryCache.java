@@ -14,9 +14,8 @@ import com.zia.test.imageloader.util.MD5Helper;
 public class MemoryCache extends ICache {
     private LruCache<String, Bitmap> lruCache;
 
-    MemoryCache(int cacheSize) {
-        //缓存容量取最大内存的1／8；
-        lruCache = new LruCache<String, Bitmap>(cacheSize) {
+    public MemoryCache() {
+        lruCache = new LruCache<String, Bitmap>((int) (Runtime.getRuntime().maxMemory()) / 3) {
             @Override
             protected int sizeOf(String key, Bitmap value) {
                 //在每次存入缓存的时候调用
