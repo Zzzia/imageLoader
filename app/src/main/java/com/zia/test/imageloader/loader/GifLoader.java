@@ -2,7 +2,6 @@ package com.zia.test.imageloader.loader;
 
 import android.view.View;
 
-import com.zia.test.imageloader.config.gif.IGifOptions;
 
 /**
  * Created by zia on 2018/4/2.

@@ -11,11 +11,11 @@ import com.zia.test.imageloader.util.MD5Helper;
  * Created by zia on 2018/4/1.
  * LruCache缓存
  */
-public class MemoryCache extends ICache {
+public class MemoryCache implements ICache {
     private LruCache<String, Bitmap> lruCache;
 
     public MemoryCache() {
-        lruCache = new LruCache<String, Bitmap>((int) (Runtime.getRuntime().maxMemory()) / 3) {
+        lruCache = new LruCache<String, Bitmap>((int) (Runtime.getRuntime().maxMemory()) / 6) {
             @Override
             protected int sizeOf(String key, Bitmap value) {
                 //在每次存入缓存的时候调用

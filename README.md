@@ -1,15 +1,21 @@
-[类的链接在这里](https://github.com/Zzzia/imageLoader/blob/master/app/src/main/java/com/zia/test/MimageLoader.java)
+# ImageLoader
 
-[recyclerAdapter链接](https://github.com/Zzzia/imageLoader/blob/master/app/src/main/java/com/zia/test/recyclerAdapter.java)
+[apk](http://qiniu.zzzia.net/imageLoader.apk)(可能需要手动给文件读写权限)
 
-没毛病的三级缓存...
+<img src="https://github.com/Zzzia/imageLoader/blob/master/screenshot.png">
 
-example:
-
+~~~java
+//自定义配置
+RequestOptions options = new RequestOptions()
+            .setPreloadPic(R.mipmap.head)//正在加载图片
+            .setAutoSizeByWidth(400)//自动调整分辨率
+            .setErrorPic(R.mipmap.ic_launcher);//加载错误图片
+//链式加载图片
+ImageLoader
+        .with(mContext)
+        .load(url))
+        .apply(options)
+        .into(imageView)
+        .display();
 ~~~
-MimageLoader.build(mContext).
-     setMultiple(4).                                //设置内存缓存的大小，4代表最大内存的1/4
-     setImagePlace(R.mipmap.ic_launcher).           //设置未加载出来之前显示的图片
-     setDiskCacheSize(100).                         //设置磁盘缓存大小，这里是100Mb
-     setBitmap(urlList.get(position),imageView);    //设置图片，url和imageview
 

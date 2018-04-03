@@ -28,14 +28,18 @@ public class ImageLoader {
         requestManager = new RequestManager();
     }
 
+    private void setContext(Context context) {
+        this.context = context;
+    }
+
     public static RequestManager with(Context context) {
-        getInstance().context = context;
+        getInstance().setContext(context);
         return getInstance().requestManager;
     }
 
-    public static void clearCache(){
+    public static void clearCache() {
         getInstance().context = null;
-        getInstance().requestManager.clearCache();
+        getInstance().requestManager = null;
     }
 
     public Context getContext() {

@@ -30,8 +30,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if (!PermissionsUtil.hasDiskPermission(this,200)){
-            Log.e("zfd","no permission");
+        if (!PermissionsUtil.hasDiskPermission(this, 200)) {
+            Log.e("zfd", "no permission");
         }
         bind();
         getData();
@@ -39,38 +39,38 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void bind(){
-        imageView = (ImageView)findViewById(R.id.image);
-        recyclerView = (RecyclerView)findViewById(R.id.recylcerView);
+    private void bind() {
+        imageView = findViewById(R.id.image);
+        recyclerView = findViewById(R.id.recylcerView);
     }
 
-    private void setRecyclerView(){
-                StaggeredGridLayoutManager manager = new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL);
-                recyclerView.setLayoutManager(new LinearLayoutManager(this));
+    private void setRecyclerView() {
+        StaggeredGridLayoutManager manager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(manager);
         //recyclerView.setLayoutManager(manager);
-                adapter = new recyclerAdapter(new ArrayList<String>());
-                recyclerView.setAdapter(adapter);
+        adapter = new recyclerAdapter(new ArrayList<String>());
+        recyclerView.setAdapter(adapter);
     }
 
-    private void getData(){
-            HttpUtils.sendHttpRequest("http://gank.io/api/data/%E7%A6%8F%E5%88%A9/0/0", new HttpUtils.CallBack() {
-                @Override
-                public void onFinish(final String response) {
-                    Gson gson = new Gson();
-                    Log.d("zzzia",response);
-                    data = gson.fromJson(response, Data.class);
-                    int i=0;
-                    for(;i<data.getResults().length;i++){
-                        urlList.add(data.getResults()[i].getUrl());
-                    }
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            adapter.refresh(urlList);
-                        }
-                    });
+    private void getData() {
+        HttpUtils.sendHttpRequest("http://gank.io/api/data/%E7%A6%8F%E5%88%A9/0/0", new HttpUtils.CallBack() {
+            @Override
+            public void onFinish(final String response) {
+                Gson gson = new Gson();
+                Log.d("zzzia", response);
+                data = gson.fromJson(response, Data.class);
+                int i = 0;
+                for (; i < data.getResults().length; i++) {
+                    urlList.add(data.getResults()[i].getUrl());
                 }
-            });
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        adapter.refresh(urlList);
+                    }
+                });
+            }
+        });
     }
 
 }

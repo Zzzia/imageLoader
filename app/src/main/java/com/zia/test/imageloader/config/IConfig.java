@@ -7,8 +7,14 @@ import java.util.concurrent.Executor;
  * 配置接口
  */
 public interface IConfig {
-    String getSavePath();
     Executor getTreadPoolExecutor();
     long getDiskCacheSize();
-    boolean isPreloadPic();
+    boolean hasPreloadPic();
+    int getWidth();
+    int getHeight();
+    boolean isAutoSizeByView();
+    boolean isAutoSizeByHeight();
+    boolean isAutoSizeByWidth();
+    int getErrorPic();
+    int getPreloadPic();
 }

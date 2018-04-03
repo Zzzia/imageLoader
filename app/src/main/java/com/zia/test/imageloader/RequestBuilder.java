@@ -5,7 +5,7 @@ import android.widget.ImageView;
 import com.zia.test.imageloader.cache.ICache;
 import com.zia.test.imageloader.cache.strategy.net.DefaultNetCache;
 import com.zia.test.imageloader.config.IConfig;
-import com.zia.test.imageloader.config.net.NetOptions;
+import com.zia.test.imageloader.config.RequestOptions;
 import com.zia.test.imageloader.loader.ILoader;
 
 /**
@@ -30,7 +30,7 @@ public class RequestBuilder {
         this.source = source;
         this.loader = loader;
         this.cache = DefaultNetCache.getInstance();
-        this.config = new NetOptions();
+        this.config = new RequestOptions();
         return this;
     }
 

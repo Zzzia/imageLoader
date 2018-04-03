@@ -1,15 +1,14 @@
 package com.zia.test;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.zia.test.imageloader.ImageLoader;
+import com.zia.test.imageloader.config.RequestOptions;
 
 import java.util.List;
 
@@ -19,12 +18,11 @@ import java.util.List;
 
 public class recyclerAdapter extends RecyclerView.Adapter<recyclerAdapter.MyViewHolder> {
 
-    public interface CallBack {
-        void onFinish();
-    }
 
     private Context mContext;
-    List<String> urlList = null;
+    private List<String> urlList;
+    private int width = 0;
+    private int height = 0;
 
     recyclerAdapter(List<String> urlList) {
         this.urlList = urlList;
@@ -47,14 +45,18 @@ public class recyclerAdapter extends RecyclerView.Adapter<recyclerAdapter.MyView
         return holder;
     }
 
+    private final RequestOptions options = new RequestOptions()
+            .setPreloadPic(R.mipmap.head)
+            .setAutoSizeByWidth(400)
+            .setErrorPic(R.mipmap.ic_launcher);
 
     @Override
-    public void onBindViewHolder(final MyViewHolder holder, int position) {
-        ImageView imageView = holder.imageView;
-        imageView.setVisibility(View.VISIBLE);
+    public void onBindViewHolder(final MyViewHolder holder, final int position) {
+        final ImageView imageView = holder.imageView;
         ImageLoader
                 .with(mContext)
-                .load(urlList.get(position))
+                .load(urlList.get(holder.getAdapterPosition()))
+                .apply(options)
                 .into(imageView)
                 .display();
     }

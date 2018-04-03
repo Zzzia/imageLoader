@@ -91,4 +91,18 @@ public class IoHelper {
         }
         return bitmap;
     }
+
+    public static void cleanDiskCache(String path, long diskCacheSize) {
+        File file = new File(path);
+        File[] files = file.listFiles();
+        long sum = 0;
+        for (File f : files) {
+            sum += f.length();
+        }
+        if (sum > diskCacheSize) {
+            for (File f : files) {
+                f.delete();
+            }
+        }
+    }
 }
